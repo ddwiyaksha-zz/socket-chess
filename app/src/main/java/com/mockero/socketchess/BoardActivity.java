@@ -2,18 +2,34 @@ package com.mockero.socketchess;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class BoardActivity extends ActionBarActivity {
 
+    private RecyclerView recyclerView;
+    private GridLayoutManager layoutManager;
+    private BoardAdapter adapter;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board);
+        initializeComponent();
     }
 
+    private void initializeComponent() {
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        layoutManager = new GridLayoutManager(this, 8);
+        recyclerView.setLayoutManager(layoutManager);
+
+        adapter = new BoardAdapter();
+        recyclerView.setAdapter(adapter);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
