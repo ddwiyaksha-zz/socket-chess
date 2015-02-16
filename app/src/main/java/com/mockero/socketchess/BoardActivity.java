@@ -13,6 +13,7 @@ public class BoardActivity extends ActionBarActivity {
     private RecyclerView recyclerView;
     private GridLayoutManager layoutManager;
     private BoardAdapter adapter;
+    private CommunicationThread communication;
 
 
     @Override
@@ -34,8 +35,14 @@ public class BoardActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        CommunicationThread comm = new CommunicationThread();
-        comm.start();
+        communication = new CommunicationThread();
+        communication.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        communication.cancel();
     }
 
     @Override

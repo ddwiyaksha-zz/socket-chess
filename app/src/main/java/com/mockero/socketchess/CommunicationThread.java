@@ -19,9 +19,12 @@ public class CommunicationThread extends Thread {
     private final String TAG = getClass().getSimpleName();
     private Socket socket;
     private InputStream istream;
+    private static boolean running = true;
 
     private final static String server = "xinuc.org";
     private final static int port = 7387;
+    private BufferedReader reader;
+    private String message;
 
 
     public CommunicationThread() {
@@ -30,10 +33,8 @@ public class CommunicationThread extends Thread {
 
     @Override
     public void run() {
-        BufferedReader reader = null;
-        String message = null;
 
-        while(true) {
+        while(running) {
             try {
                 if(socket == null || !socket.isConnected()) {
                     InetAddress address = InetAddress.getByName(server);
@@ -42,7 +43,10 @@ public class CommunicationThread extends Thread {
                     istream = socket.getInputStream();
                     reader = new BufferedReader(new InputStreamReader(istream));
                 }
-                message = reader.readLine();
+
+                if(reader != null) {
+                    message = reader.readLine();
+                }
 //                reader.close();
                 Log.e(TAG, "input : " + message);
             } catch (IOException e) {
@@ -54,6 +58,9 @@ public class CommunicationThread extends Thread {
 
     public void cancel() {
         try {
+            running = false;
+            reader.close();
+            istream.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
