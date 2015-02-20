@@ -13,20 +13,23 @@
         android:id="@+id/recycler_view"
         android:background="@android:color/black"
         android:padding="1dp"
-        android:layout_width="512dp"
-        android:layout_height="512dp"/>
+        android:layout_width="@dimen/board_size"
+        android:layout_height="@dimen/board_size"/>
 
     <TextView
         android:id="@+id/text"
         android:text="Input"
         android:textStyle="bold"
+        android:textSize="20sp"
         android:textColor="@android:color/black"
         android:paddingTop="16dp"
+        android:paddingBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/input"
+        android:textSize="18sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

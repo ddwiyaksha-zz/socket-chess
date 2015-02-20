@@ -6,7 +6,7 @@
 
     <ImageButton
         android:id="@+id/cell"
-        android:layout_width="64dp"
-        android:layout_height="64dp" />
+        android:layout_width="@dimen/cell_size"
+        android:layout_height="@dimen/cell_size" />
 
 </LinearLayout>

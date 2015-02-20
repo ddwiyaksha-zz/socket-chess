@@ -1,5 +1,7 @@
 package com.mockero.socketchess;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -25,18 +27,28 @@ public class CommunicationThread extends Thread {
     private final static int port = 7387;
     private BufferedReader reader;
     private String message;
+    private Context context;
+    private Intent intent;
 
 
-    public CommunicationThread() {
-
+    public CommunicationThread(Context context) {
+        this.context = context;
+        intent = new Intent("com.mockero.socketchess.piece");
     }
 
     @Override
     public void run() {
 
+        intent.putExtra("piece", "Starting..");
+        context.sendBroadcast(intent);
+        Log.e(TAG, "Running : " + running);
         while(running) {
             try {
                 if(socket == null || !socket.isConnected()) {
+                    intent.putExtra("piece", "Reconnecting..");
+                    context.sendBroadcast(intent);
+
+                    Log.e(TAG, "Reconnecting..");
                     InetAddress address = InetAddress.getByName(server);
                     socket = new Socket(address, port);
                     socket.setKeepAlive(true);
@@ -46,6 +58,8 @@ public class CommunicationThread extends Thread {
 
                 if(reader != null) {
                     message = reader.readLine();
+                    intent.putExtra("piece", message);
+                    context.sendBroadcast(intent);
                 }
 //                reader.close();
                 Log.e(TAG, "input : " + message);
@@ -56,14 +70,19 @@ public class CommunicationThread extends Thread {
         }
     }
 
+    public void restart() {
+        running = true;
+    }
+
     public void cancel() {
         try {
             running = false;
-            reader.close();
-            istream.close();
-            socket.close();
+            if(reader != null) reader.close();
+            if(istream != null) istream.close();
+            if(socket != null) socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }

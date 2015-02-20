@@ -1,11 +1,18 @@
 package com.mockero.socketchess;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class BoardActivity extends ActionBarActivity {
@@ -14,6 +21,8 @@ public class BoardActivity extends ActionBarActivity {
     private GridLayoutManager layoutManager;
     private BoardAdapter adapter;
     private CommunicationThread communication;
+    private Receiver receiver;
+    private TextView inputView;
 
 
     @Override
@@ -24,6 +33,7 @@ public class BoardActivity extends ActionBarActivity {
     }
 
     private void initializeComponent() {
+        inputView = (TextView) findViewById(R.id.input);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         layoutManager = new GridLayoutManager(this, 8);
         recyclerView.setLayoutManager(layoutManager);
@@ -35,7 +45,10 @@ public class BoardActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        communication = new CommunicationThread();
+        receiver = new Receiver(adapter, inputView);
+        registerReceiver(receiver, new IntentFilter("com.mockero.socketchess.piece"));
+        communication = new CommunicationThread(this);
+        communication.restart();
         communication.start();
     }
 
@@ -43,6 +56,7 @@ public class BoardActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         communication.cancel();
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -66,4 +80,29 @@ public class BoardActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public static class Receiver extends BroadcastReceiver {
+
+        private BoardAdapter adapter;
+        private TextView inputView;
+
+        public Receiver(BoardAdapter adapter, TextView inputView) {
+            this.adapter = adapter;
+            this.inputView = inputView;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("piece");
+            Log.e("Receiver", "message : " + message);
+            if(!TextUtils.isEmpty(message)) {
+                if(!message.equals("Reconnecting..") && !message.equals("Starting..")) {
+                    Log.e("Receiver", "processing : " + message);
+                    adapter.setPiece(message);
+                }
+                inputView.setText(message);
+            }
+        }
+    }
+
 }
